@@ -34,9 +34,6 @@ import {
   UnsignedStakingTransaction,
 } from "./types";
 const logger = new Logger("hmy_transaction/0.0.1");
-const {TextEncoder, TextDecoder} = require("fastestsmallesttextencoderdecoder");
-const textEncoder = new TextEncoder();
-const textDecoder = new TextDecoder("utf-8");
 
 const transactionFields = [
   { name: "nonce", maxLength: 32, numeric: true },
@@ -79,11 +76,11 @@ function formatDecimal(value: BigNumberish | string): Array<string> {
 
 function formatDescription(value: Partial<Description>): Array<Uint8Array> {
   return [
-    textEncoder.encode(value.name ?? ""),
-    textEncoder.encode(value.identity ?? ""),
-    textEncoder.encode(value.website ?? ""),
-    textEncoder.encode(value.securityContact ?? ""),
-    textEncoder.encode(value.details ?? ""),
+    new Uint8Array(Buffer.from(value.name ?? "")),
+    new Uint8Array(Buffer.from(value.identity ?? "")),
+    new Uint8Array(Buffer.from(value.website ?? "")),
+    new Uint8Array(Buffer.from(value.securityContact ?? "")),
+    new Uint8Array(Buffer.from(value.details ?? "")),
   ];
 }
 
@@ -244,7 +241,7 @@ function handleDecimal(value: string): string {
 }
 
 function handleText(value: string): string {
-  return textDecoder.decode(arrayify(value));
+  return Buffer.from(arrayify(value)).toString();
 }
 
 function handleValidatorDescription(value: Array<string>): Description {
