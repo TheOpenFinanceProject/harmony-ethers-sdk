@@ -1,9 +1,9 @@
 import { BlockTag, BaseProvider, JsonRpcProvider } from "@ethersproject/providers";
 import { getStatic } from "@ethersproject/properties";
-import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
+import { BigNumber } from "@ethersproject/bignumber";
 import { hexlify } from "@ethersproject/bytes";
 import { randomBytes } from "crypto";
-import { Deferrable, resolveProperties } from "@ethersproject/properties";
+import { Deferrable } from "@ethersproject/properties";
 import { Network } from "@ethersproject/networks";
 import { Logger } from "@ethersproject/logger";
 import { parseEther } from "@ethersproject/units";
@@ -112,10 +112,10 @@ export class ApiHarmonyProvider extends JsonRpcProvider implements HarmonyProvid
     return new HarmonyFormatter();
   }
 
-  formatter: HarmonyFormatter;
+  formatter!: HarmonyFormatter;
 
-  _networkPromise: Promise<HarmonyNetwork>;
-  _network: HarmonyNetwork;
+  _networkPromise!: Promise<HarmonyNetwork>;
+  _network!: HarmonyNetwork;
 
   _shardingStructure?: ShardStructure[]; // cache
 
@@ -192,22 +192,22 @@ export class ApiHarmonyProvider extends JsonRpcProvider implements HarmonyProvid
 
   async getValidatorsAddresses(): Promise<Array<string>> {
     const validators = await this.send("hmy_getAllValidatorAddresses", []);
-    return validators.map((address) => this.formatter.address(address));
+    return validators.map((address: string) => this.formatter.address(address));
   }
 
   async getActiveValidatorsAddresses(): Promise<Array<string>> {
     const validators = await this.send("hmy_getActiveValidatorAddresses", []);
-    return validators.map((address) => this.formatter.address(address));
+    return validators.map((address: string) => this.formatter.address(address));
   }
 
   async getDelegationsByValidator(validatorAddress: string): Promise<Array<Delegation>> {
     const result = await this.send("hmy_getDelegationsByValidator", [validatorAddress]);
-    return result.map((delegation) => this.formatter.delegation(delegation));
+    return result.map((delegation: string) => this.formatter.delegation(delegation));
   }
 
   async getDelegationsByDelegator(delegatorAddress: string): Promise<Array<Delegation>> {
     const result = await this.send("hmy_getDelegationsByDelegator", [delegatorAddress]);
-    return result.map((delegation) => this.formatter.delegation(delegation));
+    return result.map((delegation: string) => this.formatter.delegation(delegation));
   }
 
   _wrapTransaction(tx: Transaction, hash?: string): TransactionResponse {
@@ -216,7 +216,7 @@ export class ApiHarmonyProvider extends JsonRpcProvider implements HarmonyProvid
 
   _wrapStakingTransaction(tx: StakingTransaction, hash?: string): StakingTransactionResponse {
     const response = <StakingTransactionResponse>tx;
-    response.hash = hash;
+    response.hash = hash || '';
     return response;
   }
 
@@ -286,7 +286,7 @@ export class ApiHarmonyProvider extends JsonRpcProvider implements HarmonyProvid
     block.shardID = this.network.shardID;
 
     if (includeTransactions) {
-      let blockNumber: number = null;
+      let blockNumber: number | null = null;
       for (let i = 0; i < (<BlockWithTransactions>block).stakingTransactions.length; i++) {
         const tx = (<BlockWithTransactions>block).stakingTransactions[i];
         if (tx.blockNumber == null) {
@@ -330,13 +330,6 @@ export class ApiHarmonyProvider extends JsonRpcProvider implements HarmonyProvid
     return poll(
       async () => {
         const result = await this.perform("getStakingTransaction", params);
-
-        if (result == null) {
-          if (this._emitted["t:" + transactionHash] == null) {
-            return null;
-          }
-          return undefined;
-        }
 
         const tx = this.formatter.stakingTransactionResponse(result);
 

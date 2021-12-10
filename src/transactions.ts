@@ -103,7 +103,7 @@ function formatMsg(type: Directive, value: Msg): any {
         formatNumber(msg.minSelfDelegation, "minSelfDelegation"),
         formatNumber(msg.maxTotalDelegation, "maxTotalDelegation"),
         msg.slotPubKeys.map((key) => arrayify(key)),
-        msg.slotKeySigs.map((sig) => arrayify(sig)),
+        msg.slotKeySigs?.map((sig) => arrayify(sig)),
         formatNumber(msg.amount, "amount"),
       ];
     }
@@ -198,7 +198,7 @@ function encodeTransaction(transaction: UnsignedTransaction, fields: Array<strin
     if (typeof chainId !== "number") {
       logger.throwArgumentError("invalid transaction.chainId", "transaction", transaction);
     }
-  } else if (signature && !isBytesLike(signature) && signature.v > 28) {
+  } else if (signature && !isBytesLike(signature) && signature.v && signature.v > 28 ) {
     // No chainId provided, but the signature is signing with EIP-155; derive chainId
     chainId = Math.floor((signature.v - 35) / 2);
   }
@@ -228,7 +228,7 @@ function encodeTransaction(transaction: UnsignedTransaction, fields: Array<strin
 
 function handleAddress(value: string): string {
   if (value === "0x") {
-    return null;
+    return '';
   }
   return getAddress(value).checksum;
 }
@@ -284,7 +284,7 @@ function handleActive(value: string): boolean | null {
   return null;
 }
 
-function handleMsg(type: Directive, value: Array<string | Array<string>>): Msg {
+function handleMsg(type: Directive, value: Array<string | Array<string>>): Msg | null {
   switch (type) {
     case Directive.CreateValidator:
       return {
@@ -322,6 +322,7 @@ function handleMsg(type: Directive, value: Array<string | Array<string>>): Msg {
       } as CollectRewardsMsg;
     default:
       logger.throwArgumentError("invalid type", "type", hexlify(type));
+      return null;
   }
 }
 

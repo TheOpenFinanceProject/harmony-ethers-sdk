@@ -50,8 +50,17 @@ export interface Delegation {
 }
 
 type Formats = BaseFormats & HarmonyFormats;
-
-const TRANSACTION_TYPES = {
+interface ExtendKeys {
+  [key: string]: number;
+}
+interface TransactionTypes extends ExtendKeys {
+  CreateValidator: number,
+  EditValidator: number,
+  Delegate: number,
+  Undelegate: number,
+  CollectRewards: number,
+}
+const TRANSACTION_TYPES: TransactionTypes = {
   CreateValidator: 0,
   EditValidator: 1,
   Delegate: 2,
@@ -60,7 +69,7 @@ const TRANSACTION_TYPES = {
 };
 
 export default class HarmonyFormatter extends Formatter {
-  formats: Formats;
+  formats!: Formats;
   constructor() {
     super();
   }
@@ -217,7 +226,7 @@ export default class HarmonyFormatter extends Formatter {
     return formats;
   }
 
-  decimal(value: any): BigNumber {
+  decimal(value: any): BigNumber | null {
     if (value === "0x0") {
       return null;
     }
@@ -305,9 +314,9 @@ export default class HarmonyFormatter extends Formatter {
 
     const result: TransactionResponse = Formatter.check(this.formats.transaction, transaction);
 
-    // 0x0000... should actually be null
+    // 0x0000... should actually be empty STRING
     if (result.blockHash && result.blockHash.replace(/0/g, "") === "x") {
-      result.blockHash = null;
+      result.blockHash = '';
     }
 
     return result;
