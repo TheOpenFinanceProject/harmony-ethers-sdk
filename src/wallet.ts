@@ -33,7 +33,7 @@ const allowedTransactionKeys: Array<string> = [
 const allowedStakedTransactionKeys: Array<string> = ["chainId", "type", "msg", "gasLimit", "gasPrice", "nonce"];
 
 export default class HarmonyWallet extends Wallet {
-  provider: HarmonyProvider;
+  provider!: HarmonyProvider;
   async getChainId(): Promise<number> {
     this._checkProvider("getChainId");
     const network = await this.provider.getNetwork();
@@ -115,7 +115,7 @@ export default class HarmonyWallet extends Wallet {
     } else {
       // Make sure any provided address matches this signer
       tx.from = Promise.all([Promise.resolve(tx.from), this.getAddress()]).then((result) => {
-        if (result[0].toLowerCase() !== result[1].toLowerCase()) {
+        if (result[0]?.toLowerCase() !== result[1]?.toLowerCase()) {
           logger.throwArgumentError("from address mismatch", "transaction", transaction);
         }
         return result[0];

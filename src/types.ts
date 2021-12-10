@@ -30,11 +30,13 @@ interface BlockBase {
 export interface Block extends BlockBase {
   transactions: Array<string>;
   stakingTransactions: Array<string>;
+  _difficulty: BigNumber;
 }
 
 export interface BlockWithTransactions extends BlockBase {
   transactions: Array<TransactionResponse>;
   stakingTransactions: Array<TransactionResponse>;
+  _difficulty: BigNumber;
 }
 
 export enum Directive {
@@ -117,7 +119,7 @@ export interface Transaction extends Omit<EthTransaction, "accessList" | "type">
 
 export interface StakingTransaction extends Omit<EthTransaction, "accessList" | "type" | "data" | "value" | "to"> {
   type: Directive;
-  msg: Msg;
+  msg: Msg | null;
 }
 
 interface Response {
