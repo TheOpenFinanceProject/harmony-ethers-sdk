@@ -17,7 +17,7 @@ import { Logger } from "@ethersproject/logger";
 import * as RLP from "@ethersproject/rlp";
 import { Zero, One, Two } from "@ethersproject/constants";
 import { checkProperties } from "@ethersproject/properties";
-import { TextDecoder, TextEncoder } from "util";
+import * as util from "util";
 import { getAddress } from "./address";
 import {
   CollectRewardsMsg,
@@ -36,8 +36,8 @@ import {
 } from "./types";
 const logger = new Logger("hmy_transaction/0.0.1");
 
-const textEncoder = new TextEncoder();
-const textDecoder = new TextDecoder("utf-8");
+const textEncoder = new util.TextEncoder();
+const textDecoder = new util.TextDecoder("utf-8");
 
 const transactionFields = [
   { name: "nonce", maxLength: 32, numeric: true },
